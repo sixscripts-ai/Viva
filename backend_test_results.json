@@ -1,9 +1,9 @@
 {
   "summary": {
-    "total_tests": 9,
-    "passed_tests": 9,
-    "failed_tests": 0,
-    "success_rate": "100.0%"
+    "total_tests": 17,
+    "passed_tests": 13,
+    "failed_tests": 4,
+    "success_rate": "76.5%"
   },
   "detailed_results": [
     {
@@ -18,14 +18,61 @@
       }
     },
     {
-      "name": "Create Booking",
+      "name": "Admin Login (Invalid Email)",
+      "method": "POST",
+      "endpoint": "auth/login",
+      "expected_status": 401,
+      "actual_status": 401,
+      "success": true,
+      "response_data": {
+        "detail": "Invalid credentials"
+      }
+    },
+    {
+      "name": "Admin Login (Invalid Password)",
+      "method": "POST",
+      "endpoint": "auth/login",
+      "expected_status": 401,
+      "actual_status": 401,
+      "success": true,
+      "response_data": {
+        "detail": "Invalid credentials"
+      }
+    },
+    {
+      "name": "Admin Login (Valid)",
+      "method": "POST",
+      "endpoint": "auth/login",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhc2NodGlvbjJAZ21haWwuY29tIiwiZXhwIjoxNzY4OTcxMjA4fQ.tx9_GkaZhPq2WNUpn7cGGxBnxw2kFQQS0VOEB6K7-PY",
+        "token_type": "bearer",
+        "email": "aschtion2@gmail.com"
+      }
+    },
+    {
+      "name": "Auth Verify",
+      "method": "GET",
+      "endpoint": "auth/verify",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": {
+        "authenticated": true,
+        "email": "aschtion2@gmail.com"
+      }
+    },
+    {
+      "name": "Create Booking (Public)",
       "method": "POST",
       "endpoint": "bookings",
       "expected_status": 200,
       "actual_status": 200,
       "success": true,
       "response_data": {
-        "id": "feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
+        "id": "672224f6-5a77-4379-80b8-ec7dd3a3eab6",
         "client_name": "John Doe",
         "client_email": "john@example.com",
         "client_phone": "5551234567",
@@ -34,102 +81,23 @@
         "booking_time": "10:00 AM",
         "message": "Test booking message",
         "status": "pending",
-        "created_at": "2026-01-20T04:24:41.802038Z"
+        "created_at": "2026-01-20T04:53:28.565493Z"
       }
     },
     {
-      "name": "Get All Bookings",
-      "method": "GET",
-      "endpoint": "bookings",
-      "expected_status": 200,
-      "actual_status": 200,
-      "success": true,
-      "response_data": [
-        {
-          "id": "feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
-          "client_name": "John Doe",
-          "client_email": "john@example.com",
-          "client_phone": "5551234567",
-          "service_type": "wedding",
-          "booking_date": "2026-01-21",
-          "booking_time": "10:00 AM",
-          "message": "Test booking message",
-          "status": "pending",
-          "created_at": "2026-01-20T04:24:41.802038Z"
-        }
-      ]
-    },
-    {
-      "name": "Get Booking by ID",
-      "method": "GET",
-      "endpoint": "bookings/feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
-      "expected_status": 200,
-      "actual_status": 200,
-      "success": true,
-      "response_data": {
-        "id": "feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
-        "client_name": "John Doe",
-        "client_email": "john@example.com",
-        "client_phone": "5551234567",
-        "service_type": "wedding",
-        "booking_date": "2026-01-21",
-        "booking_time": "10:00 AM",
-        "message": "Test booking message",
-        "status": "pending",
-        "created_at": "2026-01-20T04:24:41.802038Z"
-      }
-    },
-    {
-      "name": "Update Booking Status",
-      "method": "PATCH",
-      "endpoint": "bookings/feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
-      "expected_status": 200,
-      "actual_status": 200,
-      "success": true,
-      "response_data": {
-        "id": "feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
-        "client_name": "John Doe",
-        "client_email": "john@example.com",
-        "client_phone": "5551234567",
-        "service_type": "wedding",
-        "booking_date": "2026-01-21",
-        "booking_time": "10:00 AM",
-        "message": "Test booking message",
-        "status": "confirmed",
-        "created_at": "2026-01-20T04:24:41.802038Z"
-      }
-    },
-    {
-      "name": "Create Contact Message",
+      "name": "Create Contact Message (Public)",
       "method": "POST",
       "endpoint": "contact",
       "expected_status": 200,
       "actual_status": 200,
       "success": true,
       "response_data": {
-        "id": "d420be0f-599f-4075-8840-a3d5dac6486a",
+        "id": "6ecfc1e4-5063-466d-a2a3-c7c4dd36484d",
         "name": "Jane Smith",
         "email": "jane@example.com",
         "message": "This is a test contact message for the videography services.",
-        "created_at": "2026-01-20T04:24:42.003811Z"
+        "created_at": "2026-01-20T04:53:28.607185Z"
       }
-    },
-    {
-      "name": "Get Contact Messages",
-      "method": "GET",
-      "endpoint": "contact",
-      "expected_status": 200,
-      "actual_status": 200,
-      "success": true,
-      "response_data": [
-        {
-          "id": "d420be0f-599f-4075-8840-a3d5dac6486a",
-          "name": "Jane Smith",
-          "email": "jane@example.com",
-          "message": "This is a test contact message for the videography services.",
-          "created_at": "2026-01-20T04:24:42.003811Z"
-        }
-      ]
     },
     {
       "name": "Get Available Times",
@@ -140,7 +108,6 @@
       "success": true,
       "response_data": {
         "available_times": [
-          "09:00 AM",
           "11:00 AM",
           "12:00 PM",
           "01:00 PM",
@@ -150,14 +117,156 @@
           "05:00 PM"
         ],
         "booked_times": [
+          "09:00 AM",
           "10:00 AM"
         ]
       }
     },
     {
-      "name": "Delete Booking",
+      "name": "Get All Bookings (Unauthorized)",
+      "method": "GET",
+      "endpoint": "bookings",
+      "expected_status": 401,
+      "actual_status": 403,
+      "success": false,
+      "response_data": {}
+    },
+    {
+      "name": "Get Contact Messages (Unauthorized)",
+      "method": "GET",
+      "endpoint": "contact",
+      "expected_status": 401,
+      "actual_status": 403,
+      "success": false,
+      "response_data": {}
+    },
+    {
+      "name": "Update Booking (Unauthorized)",
+      "method": "PATCH",
+      "endpoint": "bookings/672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+      "expected_status": 401,
+      "actual_status": 403,
+      "success": false,
+      "response_data": {}
+    },
+    {
+      "name": "Delete Booking (Unauthorized)",
       "method": "DELETE",
-      "endpoint": "bookings/feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
+      "endpoint": "bookings/672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+      "expected_status": 401,
+      "actual_status": 403,
+      "success": false,
+      "response_data": {}
+    },
+    {
+      "name": "Get All Bookings (Protected)",
+      "method": "GET",
+      "endpoint": "bookings",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": [
+        {
+          "id": "672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+          "client_name": "John Doe",
+          "client_email": "john@example.com",
+          "client_phone": "5551234567",
+          "service_type": "wedding",
+          "booking_date": "2026-01-21",
+          "booking_time": "10:00 AM",
+          "message": "Test booking message",
+          "status": "pending",
+          "created_at": "2026-01-20T04:53:28.565493Z"
+        },
+        {
+          "id": "77ceba85-5b4a-4ed6-b422-3c1c342ae6b8",
+          "client_name": "Test User",
+          "client_email": "test@example.com",
+          "client_phone": "5551234567",
+          "service_type": "wedding",
+          "booking_date": "2026-01-21",
+          "booking_time": "09:00 AM",
+          "message": "Test booking message",
+          "status": "confirmed",
+          "created_at": "2026-01-20T04:25:21.643121Z"
+        }
+      ]
+    },
+    {
+      "name": "Get Booking by ID (Protected)",
+      "method": "GET",
+      "endpoint": "bookings/672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": {
+        "id": "672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+        "client_name": "John Doe",
+        "client_email": "john@example.com",
+        "client_phone": "5551234567",
+        "service_type": "wedding",
+        "booking_date": "2026-01-21",
+        "booking_time": "10:00 AM",
+        "message": "Test booking message",
+        "status": "pending",
+        "created_at": "2026-01-20T04:53:28.565493Z"
+      }
+    },
+    {
+      "name": "Update Booking Status (Protected)",
+      "method": "PATCH",
+      "endpoint": "bookings/672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": {
+        "id": "672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+        "client_name": "John Doe",
+        "client_email": "john@example.com",
+        "client_phone": "5551234567",
+        "service_type": "wedding",
+        "booking_date": "2026-01-21",
+        "booking_time": "10:00 AM",
+        "message": "Test booking message",
+        "status": "confirmed",
+        "created_at": "2026-01-20T04:53:28.565493Z"
+      }
+    },
+    {
+      "name": "Get Contact Messages (Protected)",
+      "method": "GET",
+      "endpoint": "contact",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": [
+        {
+          "id": "6ecfc1e4-5063-466d-a2a3-c7c4dd36484d",
+          "name": "Jane Smith",
+          "email": "jane@example.com",
+          "message": "This is a test contact message for the videography services.",
+          "created_at": "2026-01-20T04:53:28.607185Z"
+        },
+        {
+          "id": "574da83e-b6f6-4387-9a7c-729f2c3ffba4",
+          "name": "Test Contact User",
+          "email": "testcontact@example.com",
+          "message": "This is a test contact message",
+          "created_at": "2026-01-20T04:25:53.550845Z"
+        },
+        {
+          "id": "d420be0f-599f-4075-8840-a3d5dac6486a",
+          "name": "Jane Smith",
+          "email": "jane@example.com",
+          "message": "This is a test contact message for the videography services.",
+          "created_at": "2026-01-20T04:24:42.003811Z"
+        }
+      ]
+    },
+    {
+      "name": "Delete Booking (Protected)",
+      "method": "DELETE",
+      "endpoint": "bookings/672224f6-5a77-4379-80b8-ec7dd3a3eab6",
       "expected_status": 200,
       "actual_status": 200,
       "success": true,
