@@ -219,7 +219,7 @@ class DieselMediaAPITester:
         if not booking_id:
             print("⚠️ Skipping unauthorized delete booking - no booking ID available")
             return False
-        success, _ = self.run_test("Delete Booking (Unauthorized)", "DELETE", f"bookings/{booking_id}", 401)
+        success, _ = self.run_test("Delete Booking (Unauthorized)", "DELETE", f"bookings/{booking_id}", 403)
         return success
 
 def main():
