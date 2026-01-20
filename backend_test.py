@@ -75,6 +75,45 @@ class DieselMediaAPITester:
         """Test root API endpoint"""
         return self.run_test("Root API", "GET", "", 200)
 
+    def test_admin_login_success(self):
+        """Test admin login with correct credentials"""
+        login_data = {
+            "email": "aschtion2@gmail.com",
+            "password": "Dieselmedia"
+        }
+        success, response = self.run_test("Admin Login (Valid)", "POST", "auth/login", 200, data=login_data)
+        if success and 'access_token' in response:
+            self.admin_token = response['access_token']
+            print(f"🔑 Admin token obtained: {self.admin_token[:20]}...")
+            return True
+        return False
+
+    def test_admin_login_invalid_email(self):
+        """Test admin login with invalid email"""
+        login_data = {
+            "email": "wrong@email.com",
+            "password": "Dieselmedia"
+        }
+        success, _ = self.run_test("Admin Login (Invalid Email)", "POST", "auth/login", 401, data=login_data)
+        return success
+
+    def test_admin_login_invalid_password(self):
+        """Test admin login with invalid password"""
+        login_data = {
+            "email": "aschtion2@gmail.com",
+            "password": "wrongpassword"
+        }
+        success, _ = self.run_test("Admin Login (Invalid Password)", "POST", "auth/login", 401, data=login_data)
+        return success
+
+    def test_auth_verify(self):
+        """Test auth verification endpoint"""
+        if not self.admin_token:
+            print("⚠️ Skipping auth verify - no admin token available")
+            return False
+        success, _ = self.run_test("Auth Verify", "GET", "auth/verify", 200, auth_required=True)
+        return success
+
     def test_create_booking(self):
         """Test creating a booking"""
         tomorrow = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
