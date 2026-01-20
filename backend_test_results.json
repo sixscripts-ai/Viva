@@ -1,0 +1,169 @@
+{
+  "summary": {
+    "total_tests": 9,
+    "passed_tests": 9,
+    "failed_tests": 0,
+    "success_rate": "100.0%"
+  },
+  "detailed_results": [
+    {
+      "name": "Root API",
+      "method": "GET",
+      "endpoint": "",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": {
+        "message": "Diesel Media API"
+      }
+    },
+    {
+      "name": "Create Booking",
+      "method": "POST",
+      "endpoint": "bookings",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": {
+        "id": "feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
+        "client_name": "John Doe",
+        "client_email": "john@example.com",
+        "client_phone": "5551234567",
+        "service_type": "wedding",
+        "booking_date": "2026-01-21",
+        "booking_time": "10:00 AM",
+        "message": "Test booking message",
+        "status": "pending",
+        "created_at": "2026-01-20T04:24:41.802038Z"
+      }
+    },
+    {
+      "name": "Get All Bookings",
+      "method": "GET",
+      "endpoint": "bookings",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": [
+        {
+          "id": "feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
+          "client_name": "John Doe",
+          "client_email": "john@example.com",
+          "client_phone": "5551234567",
+          "service_type": "wedding",
+          "booking_date": "2026-01-21",
+          "booking_time": "10:00 AM",
+          "message": "Test booking message",
+          "status": "pending",
+          "created_at": "2026-01-20T04:24:41.802038Z"
+        }
+      ]
+    },
+    {
+      "name": "Get Booking by ID",
+      "method": "GET",
+      "endpoint": "bookings/feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": {
+        "id": "feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
+        "client_name": "John Doe",
+        "client_email": "john@example.com",
+        "client_phone": "5551234567",
+        "service_type": "wedding",
+        "booking_date": "2026-01-21",
+        "booking_time": "10:00 AM",
+        "message": "Test booking message",
+        "status": "pending",
+        "created_at": "2026-01-20T04:24:41.802038Z"
+      }
+    },
+    {
+      "name": "Update Booking Status",
+      "method": "PATCH",
+      "endpoint": "bookings/feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": {
+        "id": "feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
+        "client_name": "John Doe",
+        "client_email": "john@example.com",
+        "client_phone": "5551234567",
+        "service_type": "wedding",
+        "booking_date": "2026-01-21",
+        "booking_time": "10:00 AM",
+        "message": "Test booking message",
+        "status": "confirmed",
+        "created_at": "2026-01-20T04:24:41.802038Z"
+      }
+    },
+    {
+      "name": "Create Contact Message",
+      "method": "POST",
+      "endpoint": "contact",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": {
+        "id": "d420be0f-599f-4075-8840-a3d5dac6486a",
+        "name": "Jane Smith",
+        "email": "jane@example.com",
+        "message": "This is a test contact message for the videography services.",
+        "created_at": "2026-01-20T04:24:42.003811Z"
+      }
+    },
+    {
+      "name": "Get Contact Messages",
+      "method": "GET",
+      "endpoint": "contact",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": [
+        {
+          "id": "d420be0f-599f-4075-8840-a3d5dac6486a",
+          "name": "Jane Smith",
+          "email": "jane@example.com",
+          "message": "This is a test contact message for the videography services.",
+          "created_at": "2026-01-20T04:24:42.003811Z"
+        }
+      ]
+    },
+    {
+      "name": "Get Available Times",
+      "method": "GET",
+      "endpoint": "available-times",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": {
+        "available_times": [
+          "09:00 AM",
+          "11:00 AM",
+          "12:00 PM",
+          "01:00 PM",
+          "02:00 PM",
+          "03:00 PM",
+          "04:00 PM",
+          "05:00 PM"
+        ],
+        "booked_times": [
+          "10:00 AM"
+        ]
+      }
+    },
+    {
+      "name": "Delete Booking",
+      "method": "DELETE",
+      "endpoint": "bookings/feb21b16-c1e7-4e85-9284-ee69cebcf6a8",
+      "expected_status": 200,
+      "actual_status": 200,
+      "success": true,
+      "response_data": {
+        "message": "Booking deleted successfully"
+      }
+    }
+  ]
+}
