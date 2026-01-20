@@ -223,27 +223,41 @@ class DieselMediaAPITester:
         return success
 
 def main():
-    print("🚀 Starting Diesel Media API Tests...")
+    print("🚀 Starting Diesel Media API Tests with Authentication...")
     tester = DieselMediaAPITester()
 
     # Test root endpoint
     tester.test_root_endpoint()
 
-    # Test booking flow
+    # Test authentication
+    print("\n🔐 Testing Authentication...")
+    tester.test_admin_login_invalid_email()
+    tester.test_admin_login_invalid_password()
+    tester.test_admin_login_success()
+    tester.test_auth_verify()
+
+    # Test public endpoints (should work without auth)
+    print("\n🌐 Testing Public Endpoints...")
     booking_id = tester.test_create_booking()
-    tester.test_get_bookings()
-    tester.test_get_booking_by_id(booking_id)
-    tester.test_update_booking_status(booking_id)
-
-    # Test contact messages
     message_id = tester.test_create_contact_message()
-    tester.test_get_contact_messages()
-
-    # Test available times
     tester.test_get_available_times()
 
-    # Test delete booking (cleanup)
-    tester.test_delete_booking(booking_id)
+    # Test unauthorized access to protected endpoints
+    print("\n🚫 Testing Unauthorized Access...")
+    tester.test_get_bookings_unauthorized()
+    tester.test_get_contact_messages_unauthorized()
+    tester.test_update_booking_unauthorized(booking_id)
+    tester.test_delete_booking_unauthorized(booking_id)
+
+    # Test protected endpoints with auth
+    print("\n🔒 Testing Protected Endpoints...")
+    tester.test_get_bookings_protected()
+    tester.test_get_booking_by_id_protected(booking_id)
+    tester.test_update_booking_status_protected(booking_id)
+    tester.test_get_contact_messages_protected()
+
+    # Test delete booking (cleanup) - protected
+    tester.test_delete_booking_protected(booking_id)
 
     # Print results
     print(f"\n📊 Test Results: {tester.tests_passed}/{tester.tests_run} passed")
