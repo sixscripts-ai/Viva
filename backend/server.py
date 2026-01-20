@@ -245,6 +245,14 @@ async def get_contact_messages(email: str = Depends(verify_token)):
     return messages
 
 
+@api_router.delete("/contact/{message_id}")
+async def delete_contact_message(message_id: str, email: str = Depends(verify_token)):
+    result = await db.contact_messages.delete_one({"id": message_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Message not found")
+    return {"message": "Message deleted successfully"}
+
+
 # Time Slots Route (Public)
 @api_router.get("/available-times")
 async def get_available_times(date: str):
