@@ -148,6 +148,19 @@ export default function AdminDashboard() {
     setIsDetailModalOpen(true);
   };
 
+  const deleteMessage = async (messageId) => {
+    if (!window.confirm("Are you sure you want to delete this message?")) return;
+    try {
+      await axios.delete(`${API}/contact/${messageId}`, {
+        headers: getAuthHeaders(),
+      });
+      setMessages((prev) => prev.filter((m) => m.id !== messageId));
+      toast.success("Message deleted");
+    } catch (error) {
+      toast.error("Failed to delete message");
+    }
+  };
+
   const formatDate = (dateStr) => {
     try {
       return format(new Date(dateStr), "MMM d, yyyy");
