@@ -215,7 +215,7 @@ export default function BookingModal({ isOpen, onClose, preSelectedService }) {
                       >
                         <SelectValue placeholder="Select a service" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#171717] border-white/10">
+                      <SelectContent className="bg-[#171717] border-white/10 z-[300]">
                         {services.map((service) => (
                           <SelectItem
                             key={service.value}
