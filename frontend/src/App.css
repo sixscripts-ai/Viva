@@ -1,3 +1,8 @@
+/* Hide Emergent badge */
+#emergent-badge {
+    display: none !important;
+}
+
 /* Diesel Media Custom Styles */
 
 /* Hero section */
