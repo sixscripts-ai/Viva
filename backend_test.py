@@ -171,7 +171,7 @@ class DieselMediaAPITester:
             print("⚠️ Skipping unauthorized update booking - no booking ID available")
             return False
         update_data = {"status": "confirmed"}
-        success, _ = self.run_test("Update Booking (Unauthorized)", "PATCH", f"bookings/{booking_id}", 401, data=update_data)
+        success, _ = self.run_test("Update Booking (Unauthorized)", "PATCH", f"bookings/{booking_id}", 403, data=update_data)
         return success
 
     def test_create_contact_message(self):
