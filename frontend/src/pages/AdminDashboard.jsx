@@ -434,9 +434,21 @@ export default function AdminDashboard() {
                           {message.email}
                         </a>
                       </div>
-                      <p className="text-[#A1A1AA] text-sm">
-                        {formatDate(message.created_at)}
-                      </p>
+                      <div className="flex items-center gap-3">
+                        <p className="text-[#A1A1AA] text-sm">
+                          {formatDate(message.created_at)}
+                        </p>
+                        <motion.button
+                          onClick={() => deleteMessage(message.id)}
+                          data-testid={`delete-message-${message.id}`}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="w-9 h-9 bg-[#171717] border border-white/10 flex items-center justify-center text-white hover:border-[#EF4444] hover:text-[#EF4444] transition-colors"
+                          aria-label="Delete message"
+                        >
+                          <Trash2 size={16} />
+                        </motion.button>
+                      </div>
                     </div>
                     <p className="text-[#A1A1AA] leading-relaxed">{message.message}</p>
                   </motion.div>
