@@ -194,7 +194,7 @@ class DieselMediaAPITester:
 
     def test_get_contact_messages_unauthorized(self):
         """Test getting contact messages without auth (should fail)"""
-        success, _ = self.run_test("Get Contact Messages (Unauthorized)", "GET", "contact", 401)
+        success, _ = self.run_test("Get Contact Messages (Unauthorized)", "GET", "contact", 403)
         return success
 
     def test_get_available_times(self):
