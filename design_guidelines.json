@@ -1,0 +1,127 @@
+{
+  "project_name": "Diesel Media",
+  "design_philosophy": {
+    "persona": "E1: The Anti-AI Designer",
+    "theme": "Diesel Noir (Cinematic, Industrial, High-Contrast)",
+    "core_principles": [
+      "Fusion over Imitation: Mix Industrial Brutalism with Cinematic Elegance.",
+      "Emotion First: Every interaction must feel 'heavy' and 'premium'.",
+      "Content is King: The video work is the hero; UI is the theater.",
+      "Negative Space: Massive margins to let the content breathe.",
+      "Anti-Pattern: No generic 'SaaS Blue' gradients. No 'Inter' for headings."
+    ]
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Anton, sans-serif",
+      "body": "Manrope, sans-serif",
+      "accent": "Bebas Neue, sans-serif"
+    },
+    "installation": "Import from Google Fonts: https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Manrope:wght@300;400;500;700&display=swap",
+    "usage_rules": {
+      "headings": "Uppercase, tracking-wide for 'Bebas', tight for 'Anton'. Huge sizes (text-6xl+).",
+      "body": "High legibility, generous line-height (leading-relaxed).",
+      "labels": "Uppercase, tracking-widest, small text (text-xs)."
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": "#050505",
+      "surface": "#0A0A0A",
+      "surface_highlight": "#171717",
+      "text_primary": "#EDEDED",
+      "text_secondary": "#A1A1AA",
+      "primary": "#F59E0B",
+      "primary_glow": "rgba(245, 158, 11, 0.5)",
+      "accent": "#D97706",
+      "border": "#262626",
+      "error": "#EF4444",
+      "success": "#10B981"
+    },
+    "gradients": {
+      "cinematic_fade": "linear-gradient(to bottom, rgba(5,5,5,0) 0%, #050505 100%)",
+      "diesel_glow": "radial-gradient(circle at center, rgba(245, 158, 11, 0.15) 0%, transparent 70%)"
+    },
+    "rules": [
+      "Never use pure black (#000000). Use #050505.",
+      "Primary color (Amber) is for CTAs and accents ONLY. Do not overuse.",
+      "Use 'diesel_glow' behind hero images or key sections for atmosphere."
+    ]
+  },
+  "layout": {
+    "grid_system": "The Bento Grid (Mode A)",
+    "spacing": {
+      "container_padding": "p-6 md:p-12 lg:p-24",
+      "section_gap": "gap-12 md:gap-24",
+      "element_gap": "gap-4 md:gap-8"
+    },
+    "containers": {
+      "max_width": "max-w-7xl mx-auto",
+      "glass_panel": "bg-black/40 backdrop-blur-xl border border-white/10"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#F59E0B] text-black font-bold uppercase tracking-wider hover:bg-[#D97706] transition-all duration-300 rounded-none skew-x-[-10deg]",
+      "secondary": "bg-transparent border border-white/20 text-white hover:border-[#F59E0B] hover:text-[#F59E0B] transition-all duration-300 uppercase tracking-wider rounded-none"
+    },
+    "cards": {
+      "style": "bg-[#0A0A0A] border border-white/5 hover:border-[#F59E0B]/50 transition-colors duration-500 group relative overflow-hidden",
+      "hover_effect": "Scale image slightly (1.05) on hover. Darken overlay."
+    },
+    "inputs": {
+      "style": "bg-[#171717] border-white/10 focus:border-[#F59E0B] text-white rounded-none h-12"
+    },
+    "navigation": {
+      "style": "Fixed top, glassmorphism (bg-black/50 backdrop-blur-md), border-b border-white/5. Logo left, Links right."
+    }
+  },
+  "assets": {
+    "images": {
+      "hero_bg": "https://images.unsplash.com/photo-1670483513924-121f2573c295?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "services": {
+        "weddings": "https://images.unsplash.com/photo-1685687919836-6c15deb19a54?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "commercials": "https://images.unsplash.com/photo-1589994850515-ad76ef242731?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "real_estate": "https://images.unsplash.com/photo-1592229505801-77b31918d822?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "events": "https://images.unsplash.com/photo-1623332517008-b24881735e47?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "social_media": "https://images.unsplash.com/photo-1603207757545-de4fffdb404c?crop=entropy&cs=srgb&fm=jpg&q=85"
+      },
+      "portfolio_placeholders": [
+        "https://images.unsplash.com/photo-1753996297177-a852d17fb202?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "https://images.unsplash.com/photo-1718421280278-4402ea0c00eb?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "https://images.unsplash.com/photo-1716033752174-cc7904edf0dc?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "https://images.unsplash.com/photo-1630401450821-018693a1c7d3?crop=entropy&cs=srgb&fm=jpg&q=85"
+      ]
+    },
+    "icons": "Lucide React (Camera, Calendar, Play, Instagram, Menu, X, ChevronRight, MapPin, Mail, Phone)"
+  },
+  "motion": {
+    "library": "Framer Motion",
+    "rules": [
+      "Use 'Lenis' for smooth scrolling.",
+      "Stagger children animations for lists/grids.",
+      "Hero text should reveal character-by-character or line-by-line.",
+      "Images should have a slow parallax effect."
+    ]
+  },
+  "accessibility": {
+    "contrast": "Ensure text is #EDEDED on dark backgrounds. Use #A1A1AA for secondary text.",
+    "focus_states": "Visible outline in #F59E0B for keyboard navigation.",
+    "aria_labels": "Required for all icon-only buttons (social links, menu)."
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Install 'framer-motion', 'lucide-react', 'clsx', 'tailwind-merge', '@radix-ui/react-slot'.",
+    "2. CLEANUP: Remove default App.css styles. Reset body margin.",
+    "3. STRUCTURE: Create a LandingPage component and a BookingModal component.",
+    "4. ADMIN: Create a simple AdminDashboard component (protected by a simple client-side secret or just hidden route for MVP).",
+    "5. BOOKING: Use a custom form with Shadcn UI elements. No backend integration needed yet, just console log or mock success.",
+    "6. CRITICAL: Implement the 'Diesel Noir' theme. Dark, grainy, amber accents.",
+    "7. IMAGES: Use the provided Unsplash URLs. Do not use placeholders."
+  ],
+  "universal_guidelines": [
+    "Do not use 'Inter' for headings. Use 'Anton'.",
+    "Do not use gradients for text unless it's a very subtle shine.",
+    "Ensure all interactive elements have hover states.",
+    "Use 'data-testid' for all interactive elements."
+  ]
+}
