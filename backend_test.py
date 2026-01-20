@@ -115,7 +115,7 @@ class DieselMediaAPITester:
         return success
 
     def test_create_booking(self):
-        """Test creating a booking"""
+        """Test creating a booking (public endpoint)"""
         tomorrow = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
         booking_data = {
             "client_name": "John Doe",
@@ -126,29 +126,52 @@ class DieselMediaAPITester:
             "booking_time": "10:00 AM",
             "message": "Test booking message"
         }
-        success, response = self.run_test("Create Booking", "POST", "bookings", 200, data=booking_data)
+        success, response = self.run_test("Create Booking (Public)", "POST", "bookings", 200, data=booking_data)
         return response.get('id') if success else None
 
-    def test_get_bookings(self):
-        """Test getting all bookings"""
-        success, response = self.run_test("Get All Bookings", "GET", "bookings", 200)
+    def test_get_bookings_protected(self):
+        """Test getting all bookings (protected endpoint)"""
+        if not self.admin_token:
+            print("⚠️ Skipping protected get bookings - no admin token available")
+            return False
+        success, response = self.run_test("Get All Bookings (Protected)", "GET", "bookings", 200, auth_required=True)
         return success
 
-    def test_get_booking_by_id(self, booking_id):
-        """Test getting a specific booking"""
+    def test_get_bookings_unauthorized(self):
+        """Test getting all bookings without auth (should fail)"""
+        success, _ = self.run_test("Get All Bookings (Unauthorized)", "GET", "bookings", 401)
+        return success
+
+    def test_get_booking_by_id_protected(self, booking_id):
+        """Test getting a specific booking (protected endpoint)"""
         if not booking_id:
             print("⚠️ Skipping get booking by ID - no booking ID available")
             return False
-        success, _ = self.run_test("Get Booking by ID", "GET", f"bookings/{booking_id}", 200)
+        if not self.admin_token:
+            print("⚠️ Skipping protected get booking by ID - no admin token available")
+            return False
+        success, _ = self.run_test("Get Booking by ID (Protected)", "GET", f"bookings/{booking_id}", 200, auth_required=True)
         return success
 
-    def test_update_booking_status(self, booking_id):
-        """Test updating booking status"""
+    def test_update_booking_status_protected(self, booking_id):
+        """Test updating booking status (protected endpoint)"""
         if not booking_id:
             print("⚠️ Skipping update booking status - no booking ID available")
             return False
+        if not self.admin_token:
+            print("⚠️ Skipping protected update booking status - no admin token available")
+            return False
         update_data = {"status": "confirmed"}
-        success, _ = self.run_test("Update Booking Status", "PATCH", f"bookings/{booking_id}", 200, data=update_data)
+        success, _ = self.run_test("Update Booking Status (Protected)", "PATCH", f"bookings/{booking_id}", 200, data=update_data, auth_required=True)
+        return success
+
+    def test_update_booking_unauthorized(self, booking_id):
+        """Test updating booking status without auth (should fail)"""
+        if not booking_id:
+            print("⚠️ Skipping unauthorized update booking - no booking ID available")
+            return False
+        update_data = {"status": "confirmed"}
+        success, _ = self.run_test("Update Booking (Unauthorized)", "PATCH", f"bookings/{booking_id}", 401, data=update_data)
         return success
 
     def test_create_contact_message(self):
