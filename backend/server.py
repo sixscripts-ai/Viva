@@ -112,7 +112,7 @@ class ContactMessage(BaseModel):
 class ContactMessageCreate(BaseModel):
     name: str = Field(..., min_length=2)
     email: EmailStr
-    message: str = Field(..., min_length=10)
+    message: str = Field(..., min_length=1)
 
 
 # Auth Helper Functions

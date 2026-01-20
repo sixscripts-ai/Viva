@@ -32,6 +32,12 @@ export default function ContactSection() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.message) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
@@ -39,7 +45,9 @@ export default function ContactSection() {
       toast.success("Message sent! We'll get back to you soon.");
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
-      toast.error("Failed to send message. Please try again.");
+      console.error("Contact form error:", error);
+      const errorMsg = error.response?.data?.detail?.[0]?.msg || "Failed to send message. Please try again.";
+      toast.error(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
