@@ -175,18 +175,26 @@ class DieselMediaAPITester:
         return success
 
     def test_create_contact_message(self):
-        """Test creating a contact message"""
+        """Test creating a contact message (public endpoint)"""
         message_data = {
             "name": "Jane Smith",
             "email": "jane@example.com",
             "message": "This is a test contact message for the videography services."
         }
-        success, response = self.run_test("Create Contact Message", "POST", "contact", 200, data=message_data)
+        success, response = self.run_test("Create Contact Message (Public)", "POST", "contact", 200, data=message_data)
         return response.get('id') if success else None
 
-    def test_get_contact_messages(self):
-        """Test getting all contact messages"""
-        success, response = self.run_test("Get Contact Messages", "GET", "contact", 200)
+    def test_get_contact_messages_protected(self):
+        """Test getting all contact messages (protected endpoint)"""
+        if not self.admin_token:
+            print("⚠️ Skipping protected get contact messages - no admin token available")
+            return False
+        success, response = self.run_test("Get Contact Messages (Protected)", "GET", "contact", 200, auth_required=True)
+        return success
+
+    def test_get_contact_messages_unauthorized(self):
+        """Test getting contact messages without auth (should fail)"""
+        success, _ = self.run_test("Get Contact Messages (Unauthorized)", "GET", "contact", 401)
         return success
 
     def test_get_available_times(self):
