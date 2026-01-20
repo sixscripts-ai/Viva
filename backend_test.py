@@ -203,12 +203,23 @@ class DieselMediaAPITester:
         success, response = self.run_test("Get Available Times", "GET", "available-times", 200, params={"date": tomorrow})
         return success
 
-    def test_delete_booking(self, booking_id):
-        """Test deleting a booking"""
+    def test_delete_booking_protected(self, booking_id):
+        """Test deleting a booking (protected endpoint)"""
         if not booking_id:
             print("⚠️ Skipping delete booking - no booking ID available")
             return False
-        success, _ = self.run_test("Delete Booking", "DELETE", f"bookings/{booking_id}", 200)
+        if not self.admin_token:
+            print("⚠️ Skipping protected delete booking - no admin token available")
+            return False
+        success, _ = self.run_test("Delete Booking (Protected)", "DELETE", f"bookings/{booking_id}", 200, auth_required=True)
+        return success
+
+    def test_delete_booking_unauthorized(self, booking_id):
+        """Test deleting a booking without auth (should fail)"""
+        if not booking_id:
+            print("⚠️ Skipping unauthorized delete booking - no booking ID available")
+            return False
+        success, _ = self.run_test("Delete Booking (Unauthorized)", "DELETE", f"bookings/{booking_id}", 401)
         return success
 
 def main():
