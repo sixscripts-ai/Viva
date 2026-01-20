@@ -51,6 +51,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     checkAuth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkAuth = async () => {
@@ -94,7 +95,7 @@ export default function AdminDashboard() {
   const fetchData = async (token) => {
     setIsLoading(true);
     const headers = token ? { Authorization: `Bearer ${token}` } : getAuthHeaders();
-    
+
     try {
       const [bookingsRes, messagesRes] = await Promise.all([
         axios.get(`${API}/bookings`, { headers }),
@@ -246,11 +247,10 @@ export default function AdminDashboard() {
             data-testid="tab-bookings"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className={`px-6 py-3 font-medium uppercase tracking-wider text-sm transition-all ${
-              activeTab === "bookings"
+            className={`px-6 py-3 font-medium uppercase tracking-wider text-sm transition-all ${activeTab === "bookings"
                 ? "bg-[#F59E0B] text-black"
                 : "bg-[#171717] text-white hover:bg-[#262626]"
-            }`}
+              }`}
           >
             Bookings ({bookings.length})
           </motion.button>
@@ -259,11 +259,10 @@ export default function AdminDashboard() {
             data-testid="tab-messages"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className={`px-6 py-3 font-medium uppercase tracking-wider text-sm transition-all ${
-              activeTab === "messages"
+            className={`px-6 py-3 font-medium uppercase tracking-wider text-sm transition-all ${activeTab === "messages"
                 ? "bg-[#F59E0B] text-black"
                 : "bg-[#171717] text-white hover:bg-[#262626]"
-            }`}
+              }`}
           >
             Messages ({messages.length})
           </motion.button>
