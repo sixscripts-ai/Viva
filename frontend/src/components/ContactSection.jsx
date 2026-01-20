@@ -136,7 +136,7 @@ export default function ContactSection() {
                     Location
                   </p>
                   <p className="text-white text-lg font-medium">
-                    Oregon, USA
+                    College Station, Texas
                   </p>
                 </div>
               </motion.div>

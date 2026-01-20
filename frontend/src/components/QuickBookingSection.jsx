@@ -3,11 +3,9 @@ import { Calendar, Clock, Star, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const services = [
-  { id: "wedding", label: "Weddings", icon: "💒" },
   { id: "event", label: "Events", icon: "🎉" },
-  { id: "commercial", label: "Commercial", icon: "🎬" },
   { id: "social_media", label: "Social Media", icon: "📱" },
-  { id: "real_estate", label: "Real Estate", icon: "🏠" },
+  { id: "commercial", label: "Commercial", icon: "🎬" },
 ];
 
 const containerVariants = {
@@ -73,7 +71,7 @@ export default function QuickBookingSection({ onOpenModal }) {
           </motion.div>
 
           {/* Service Quick Select */}
-          <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-10">
+          <motion.div variants={itemVariants} className="grid grid-cols-3 gap-4 mb-10 max-w-2xl mx-auto">
             {services.map((service, index) => (
               <motion.button
                 key={service.id}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Navigation({ onBookClick }) {
@@ -74,6 +74,19 @@ export default function Navigation({ onBookClick }) {
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#F59E0B] group-hover:w-full transition-all duration-300" />
                 </motion.button>
               ))}
+              <motion.a
+                href="tel:541-844-8263"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.45, duration: 0.4 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                data-testid="nav-call-btn"
+                className="flex items-center gap-2 text-sm font-medium text-white hover:text-[#F59E0B] uppercase tracking-wider transition-colors"
+              >
+                <Phone size={16} />
+                Call
+              </motion.a>
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -150,6 +163,17 @@ export default function Navigation({ onBookClick }) {
                   {link.name}
                 </motion.button>
               ))}
+              <motion.a
+                href="tel:541-844-8263"
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.45, duration: 0.3 }}
+                data-testid="mobile-call-btn"
+                className="flex items-center gap-3 font-anton text-3xl text-[#F59E0B] hover:text-white transition-colors"
+              >
+                <Phone size={28} />
+                CALL NOW
+              </motion.a>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
