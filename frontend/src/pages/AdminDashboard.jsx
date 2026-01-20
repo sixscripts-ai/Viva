@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, RefreshCw, Trash2, Eye, Calendar, Mail, Phone, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, RefreshCw, Trash2, Eye, Calendar, Mail, Phone, Clock, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -17,6 +19,7 @@ import {
 import { toast } from "sonner";
 import axios from "axios";
 import { format } from "date-fns";
+import AdminLogin from "@/components/AdminLogin";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -36,28 +39,76 @@ const serviceLabels = {
 };
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [bookings, setBookings] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("bookings");
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   useEffect(() => {
-    fetchData();
+    checkAuth();
   }, []);
 
-  const fetchData = async () => {
+  const checkAuth = async () => {
+    const token = localStorage.getItem("diesel_admin_token");
+    if (!token) {
+      setIsCheckingAuth(false);
+      return;
+    }
+
+    try {
+      await axios.get(`${API}/auth/verify`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setIsAuthenticated(true);
+      fetchData(token);
+    } catch (error) {
+      localStorage.removeItem("diesel_admin_token");
+    } finally {
+      setIsCheckingAuth(false);
+    }
+  };
+
+  const handleLoginSuccess = (token) => {
+    localStorage.setItem("diesel_admin_token", token);
+    setIsAuthenticated(true);
+    fetchData(token);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("diesel_admin_token");
+    setIsAuthenticated(false);
+    setBookings([]);
+    setMessages([]);
+  };
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("diesel_admin_token");
+    return { Authorization: `Bearer ${token}` };
+  };
+
+  const fetchData = async (token) => {
     setIsLoading(true);
+    const headers = token ? { Authorization: `Bearer ${token}` } : getAuthHeaders();
+    
     try {
       const [bookingsRes, messagesRes] = await Promise.all([
-        axios.get(`${API}/bookings`),
-        axios.get(`${API}/contact`),
+        axios.get(`${API}/bookings`, { headers }),
+        axios.get(`${API}/contact`, { headers }),
       ]);
       setBookings(bookingsRes.data);
       setMessages(messagesRes.data);
     } catch (error) {
-      toast.error("Failed to fetch data");
+      if (error.response?.status === 401) {
+        handleLogout();
+        toast.error("Session expired. Please login again.");
+      } else {
+        toast.error("Failed to fetch data");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +116,11 @@ export default function AdminDashboard() {
 
   const updateBookingStatus = async (bookingId, newStatus) => {
     try {
-      await axios.patch(`${API}/bookings/${bookingId}`, { status: newStatus });
+      await axios.patch(
+        `${API}/bookings/${bookingId}`,
+        { status: newStatus },
+        { headers: getAuthHeaders() }
+      );
       setBookings((prev) =>
         prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b))
       );
@@ -78,7 +133,9 @@ export default function AdminDashboard() {
   const deleteBooking = async (bookingId) => {
     if (!window.confirm("Are you sure you want to delete this booking?")) return;
     try {
-      await axios.delete(`${API}/bookings/${bookingId}`);
+      await axios.delete(`${API}/bookings/${bookingId}`, {
+        headers: getAuthHeaders(),
+      });
       setBookings((prev) => prev.filter((b) => b.id !== bookingId));
       toast.success("Booking deleted");
     } catch (error) {
@@ -99,20 +156,44 @@ export default function AdminDashboard() {
     }
   };
 
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        >
+          <RefreshCw size={32} className="text-[#F59E0B]" />
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <AdminLogin onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
-    <div className="min-h-screen bg-[#050505]" data-testid="admin-dashboard">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="min-h-screen bg-[#050505]"
+      data-testid="admin-dashboard"
+    >
       {/* Header */}
       <header className="bg-[#0A0A0A] border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <a
+              <motion.a
                 href="/"
                 data-testid="admin-back-link"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 className="w-10 h-10 bg-[#171717] border border-white/10 flex items-center justify-center text-white hover:border-[#F59E0B] transition-colors"
               >
                 <ArrowLeft size={20} />
-              </a>
+              </motion.a>
               <div>
                 <h1 className="font-anton text-2xl text-white">
                   ADMIN <span className="text-[#F59E0B]">DASHBOARD</span>
@@ -120,15 +201,26 @@ export default function AdminDashboard() {
                 <p className="text-[#A1A1AA] text-sm">Manage bookings and messages</p>
               </div>
             </div>
-            <Button
-              onClick={fetchData}
-              data-testid="refresh-btn"
-              variant="outline"
-              className="bg-transparent border-white/20 text-white hover:border-[#F59E0B] hover:text-[#F59E0B]"
-            >
-              <RefreshCw size={18} className={isLoading ? "animate-spin" : ""} />
-              <span className="ml-2">Refresh</span>
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => fetchData()}
+                data-testid="refresh-btn"
+                variant="outline"
+                className="bg-transparent border-white/20 text-white hover:border-[#F59E0B] hover:text-[#F59E0B]"
+              >
+                <RefreshCw size={18} className={isLoading ? "animate-spin" : ""} />
+                <span className="ml-2 hidden sm:inline">Refresh</span>
+              </Button>
+              <Button
+                onClick={handleLogout}
+                data-testid="logout-btn"
+                variant="outline"
+                className="bg-transparent border-red-500/30 text-red-400 hover:border-red-500 hover:text-red-300"
+              >
+                <LogOut size={18} />
+                <span className="ml-2 hidden sm:inline">Logout</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -136,9 +228,11 @@ export default function AdminDashboard() {
       {/* Tabs */}
       <div className="max-w-7xl mx-auto px-6 lg:px-12 py-6">
         <div className="flex gap-4 mb-8">
-          <button
+          <motion.button
             onClick={() => setActiveTab("bookings")}
             data-testid="tab-bookings"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className={`px-6 py-3 font-medium uppercase tracking-wider text-sm transition-all ${
               activeTab === "bookings"
                 ? "bg-[#F59E0B] text-black"
@@ -146,10 +240,12 @@ export default function AdminDashboard() {
             }`}
           >
             Bookings ({bookings.length})
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             onClick={() => setActiveTab("messages")}
             data-testid="tab-messages"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className={`px-6 py-3 font-medium uppercase tracking-wider text-sm transition-all ${
               activeTab === "messages"
                 ? "bg-[#F59E0B] text-black"
@@ -157,154 +253,185 @@ export default function AdminDashboard() {
             }`}
           >
             Messages ({messages.length})
-          </button>
+          </motion.button>
         </div>
 
         {/* Bookings Tab */}
-        {activeTab === "bookings" && (
-          <div className="bg-[#0A0A0A] border border-white/5 overflow-hidden">
-            {isLoading ? (
-              <div className="p-12 text-center text-[#A1A1AA]">Loading...</div>
-            ) : bookings.length === 0 ? (
-              <div className="p-12 text-center text-[#A1A1AA]">
-                No bookings yet
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="admin-table" data-testid="bookings-table">
-                  <thead>
-                    <tr>
-                      <th>Client</th>
-                      <th>Service</th>
-                      <th>Date & Time</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {bookings.map((booking) => (
-                      <tr key={booking.id} data-testid={`booking-row-${booking.id}`}>
-                        <td>
-                          <div>
-                            <p className="text-white font-medium">
-                              {booking.client_name}
-                            </p>
-                            <p className="text-[#A1A1AA] text-sm">
-                              {booking.client_email}
-                            </p>
-                          </div>
-                        </td>
-                        <td className="text-white">
-                          {serviceLabels[booking.service_type] || booking.service_type}
-                        </td>
-                        <td>
-                          <div className="flex items-center gap-2 text-white">
-                            <Calendar size={16} className="text-[#F59E0B]" />
-                            {formatDate(booking.booking_date)}
-                          </div>
-                          <div className="flex items-center gap-2 text-[#A1A1AA] text-sm mt-1">
-                            <Clock size={14} />
-                            {booking.booking_time}
-                          </div>
-                        </td>
-                        <td>
-                          <Select
-                            value={booking.status}
-                            onValueChange={(value) =>
-                              updateBookingStatus(booking.id, value)
-                            }
-                          >
-                            <SelectTrigger
-                              data-testid={`status-select-${booking.id}`}
-                              className={`w-[140px] h-9 ${statusColors[booking.status]} border-none`}
-                            >
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-[#171717] border-white/10">
-                              <SelectItem value="pending" className="text-[#F59E0B]">
-                                Pending
-                              </SelectItem>
-                              <SelectItem value="confirmed" className="text-[#10B981]">
-                                Confirmed
-                              </SelectItem>
-                              <SelectItem value="completed" className="text-[#3B82F6]">
-                                Completed
-                              </SelectItem>
-                              <SelectItem value="cancelled" className="text-[#EF4444]">
-                                Cancelled
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </td>
-                        <td>
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => openBookingDetail(booking)}
-                              data-testid={`view-booking-${booking.id}`}
-                              className="w-9 h-9 bg-[#171717] border border-white/10 flex items-center justify-center text-white hover:border-[#F59E0B] hover:text-[#F59E0B] transition-colors"
-                              aria-label="View details"
-                            >
-                              <Eye size={16} />
-                            </button>
-                            <button
-                              onClick={() => deleteBooking(booking.id)}
-                              data-testid={`delete-booking-${booking.id}`}
-                              className="w-9 h-9 bg-[#171717] border border-white/10 flex items-center justify-center text-white hover:border-[#EF4444] hover:text-[#EF4444] transition-colors"
-                              aria-label="Delete booking"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Messages Tab */}
-        {activeTab === "messages" && (
-          <div className="space-y-4">
-            {isLoading ? (
-              <div className="bg-[#0A0A0A] border border-white/5 p-12 text-center text-[#A1A1AA]">
-                Loading...
-              </div>
-            ) : messages.length === 0 ? (
-              <div className="bg-[#0A0A0A] border border-white/5 p-12 text-center text-[#A1A1AA]">
-                No messages yet
-              </div>
-            ) : (
-              messages.map((message) => (
-                <div
-                  key={message.id}
-                  data-testid={`message-card-${message.id}`}
-                  className="bg-[#0A0A0A] border border-white/5 p-6"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <p className="text-white font-medium text-lg">
-                        {message.name}
-                      </p>
-                      <a
-                        href={`mailto:${message.email}`}
-                        className="text-[#F59E0B] text-sm hover:underline"
-                      >
-                        {message.email}
-                      </a>
-                    </div>
-                    <p className="text-[#A1A1AA] text-sm">
-                      {formatDate(message.created_at)}
-                    </p>
-                  </div>
-                  <p className="text-[#A1A1AA] leading-relaxed">{message.message}</p>
+        <AnimatePresence mode="wait">
+          {activeTab === "bookings" && (
+            <motion.div
+              key="bookings"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="bg-[#0A0A0A] border border-white/5 overflow-hidden"
+            >
+              {isLoading ? (
+                <div className="p-12 text-center text-[#A1A1AA]">
+                  <RefreshCw className="animate-spin mx-auto mb-4" size={32} />
+                  Loading...
                 </div>
-              ))
-            )}
-          </div>
-        )}
+              ) : bookings.length === 0 ? (
+                <div className="p-12 text-center text-[#A1A1AA]">
+                  No bookings yet
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="admin-table" data-testid="bookings-table">
+                    <thead>
+                      <tr>
+                        <th>Client</th>
+                        <th>Service</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bookings.map((booking, index) => (
+                        <motion.tr
+                          key={booking.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          data-testid={`booking-row-${booking.id}`}
+                        >
+                          <td>
+                            <div>
+                              <p className="text-white font-medium">
+                                {booking.client_name}
+                              </p>
+                              <p className="text-[#A1A1AA] text-sm">
+                                {booking.client_email}
+                              </p>
+                            </div>
+                          </td>
+                          <td className="text-white">
+                            {serviceLabels[booking.service_type] || booking.service_type}
+                          </td>
+                          <td>
+                            <div className="flex items-center gap-2 text-white">
+                              <Calendar size={16} className="text-[#F59E0B]" />
+                              {formatDate(booking.booking_date)}
+                            </div>
+                            <div className="flex items-center gap-2 text-[#A1A1AA] text-sm mt-1">
+                              <Clock size={14} />
+                              {booking.booking_time}
+                            </div>
+                          </td>
+                          <td>
+                            <Select
+                              value={booking.status}
+                              onValueChange={(value) =>
+                                updateBookingStatus(booking.id, value)
+                              }
+                            >
+                              <SelectTrigger
+                                data-testid={`status-select-${booking.id}`}
+                                className={`w-[140px] h-9 ${statusColors[booking.status]} border-none`}
+                              >
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="bg-[#171717] border-white/10">
+                                <SelectItem value="pending" className="text-[#F59E0B]">
+                                  Pending
+                                </SelectItem>
+                                <SelectItem value="confirmed" className="text-[#10B981]">
+                                  Confirmed
+                                </SelectItem>
+                                <SelectItem value="completed" className="text-[#3B82F6]">
+                                  Completed
+                                </SelectItem>
+                                <SelectItem value="cancelled" className="text-[#EF4444]">
+                                  Cancelled
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </td>
+                          <td>
+                            <div className="flex items-center gap-2">
+                              <motion.button
+                                onClick={() => openBookingDetail(booking)}
+                                data-testid={`view-booking-${booking.id}`}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="w-9 h-9 bg-[#171717] border border-white/10 flex items-center justify-center text-white hover:border-[#F59E0B] hover:text-[#F59E0B] transition-colors"
+                                aria-label="View details"
+                              >
+                                <Eye size={16} />
+                              </motion.button>
+                              <motion.button
+                                onClick={() => deleteBooking(booking.id)}
+                                data-testid={`delete-booking-${booking.id}`}
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                className="w-9 h-9 bg-[#171717] border border-white/10 flex items-center justify-center text-white hover:border-[#EF4444] hover:text-[#EF4444] transition-colors"
+                                aria-label="Delete booking"
+                              >
+                                <Trash2 size={16} />
+                              </motion.button>
+                            </div>
+                          </td>
+                        </motion.tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* Messages Tab */}
+          {activeTab === "messages" && (
+            <motion.div
+              key="messages"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-4"
+            >
+              {isLoading ? (
+                <div className="bg-[#0A0A0A] border border-white/5 p-12 text-center text-[#A1A1AA]">
+                  <RefreshCw className="animate-spin mx-auto mb-4" size={32} />
+                  Loading...
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="bg-[#0A0A0A] border border-white/5 p-12 text-center text-[#A1A1AA]">
+                  No messages yet
+                </div>
+              ) : (
+                messages.map((message, index) => (
+                  <motion.div
+                    key={message.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    data-testid={`message-card-${message.id}`}
+                    className="bg-[#0A0A0A] border border-white/5 p-6 hover:border-[#F59E0B]/30 transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <p className="text-white font-medium text-lg">
+                          {message.name}
+                        </p>
+                        <a
+                          href={`mailto:${message.email}`}
+                          className="text-[#F59E0B] text-sm hover:underline"
+                        >
+                          {message.email}
+                        </a>
+                      </div>
+                      <p className="text-[#A1A1AA] text-sm">
+                        {formatDate(message.created_at)}
+                      </p>
+                    </div>
+                    <p className="text-[#A1A1AA] leading-relaxed">{message.message}</p>
+                  </motion.div>
+                ))
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Booking Detail Modal */}
@@ -316,7 +443,11 @@ export default function AdminDashboard() {
             </DialogTitle>
           </DialogHeader>
           {selectedBooking && (
-            <div className="space-y-6 mt-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6 mt-4"
+            >
               <div className="space-y-4">
                 <div>
                   <p className="text-[#A1A1AA] text-sm uppercase tracking-wider mb-1">
@@ -424,10 +555,10 @@ export default function AdminDashboard() {
                   </Button>
                 </a>
               </div>
-            </div>
+            </motion.div>
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </motion.div>
   );
 }
