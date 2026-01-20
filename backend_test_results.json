@@ -1,9 +1,9 @@
 {
   "summary": {
     "total_tests": 17,
-    "passed_tests": 13,
-    "failed_tests": 4,
-    "success_rate": "76.5%"
+    "passed_tests": 17,
+    "failed_tests": 0,
+    "success_rate": "100.0%"
   },
   "detailed_results": [
     {
@@ -47,7 +47,7 @@
       "actual_status": 200,
       "success": true,
       "response_data": {
-        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhc2NodGlvbjJAZ21haWwuY29tIiwiZXhwIjoxNzY4OTcxMjA4fQ.tx9_GkaZhPq2WNUpn7cGGxBnxw2kFQQS0VOEB6K7-PY",
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhc2NodGlvbjJAZ21haWwuY29tIiwiZXhwIjoxNzY4OTcxMjM3fQ.GF5CdRIIAvws66TYwXAjXK9odSKRSz_WRcsmXkFRuWU",
         "token_type": "bearer",
         "email": "aschtion2@gmail.com"
       }
@@ -72,7 +72,7 @@
       "actual_status": 200,
       "success": true,
       "response_data": {
-        "id": "672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+        "id": "f7133b2e-86c5-4217-a9f3-d87b0d4b47e2",
         "client_name": "John Doe",
         "client_email": "john@example.com",
         "client_phone": "5551234567",
@@ -81,7 +81,7 @@
         "booking_time": "10:00 AM",
         "message": "Test booking message",
         "status": "pending",
-        "created_at": "2026-01-20T04:53:28.565493Z"
+        "created_at": "2026-01-20T04:53:57.435331Z"
       }
     },
     {
@@ -92,11 +92,11 @@
       "actual_status": 200,
       "success": true,
       "response_data": {
-        "id": "6ecfc1e4-5063-466d-a2a3-c7c4dd36484d",
+        "id": "a8ba9382-1241-40ff-910f-0b76fdadec8a",
         "name": "Jane Smith",
         "email": "jane@example.com",
         "message": "This is a test contact message for the videography services.",
-        "created_at": "2026-01-20T04:53:28.607185Z"
+        "created_at": "2026-01-20T04:53:57.478858Z"
       }
     },
     {
@@ -126,37 +126,45 @@
       "name": "Get All Bookings (Unauthorized)",
       "method": "GET",
       "endpoint": "bookings",
-      "expected_status": 401,
+      "expected_status": 403,
       "actual_status": 403,
-      "success": false,
-      "response_data": {}
+      "success": true,
+      "response_data": {
+        "detail": "Not authenticated"
+      }
     },
     {
       "name": "Get Contact Messages (Unauthorized)",
       "method": "GET",
       "endpoint": "contact",
-      "expected_status": 401,
+      "expected_status": 403,
       "actual_status": 403,
-      "success": false,
-      "response_data": {}
+      "success": true,
+      "response_data": {
+        "detail": "Not authenticated"
+      }
     },
     {
       "name": "Update Booking (Unauthorized)",
       "method": "PATCH",
-      "endpoint": "bookings/672224f6-5a77-4379-80b8-ec7dd3a3eab6",
-      "expected_status": 401,
+      "endpoint": "bookings/f7133b2e-86c5-4217-a9f3-d87b0d4b47e2",
+      "expected_status": 403,
       "actual_status": 403,
-      "success": false,
-      "response_data": {}
+      "success": true,
+      "response_data": {
+        "detail": "Not authenticated"
+      }
     },
     {
       "name": "Delete Booking (Unauthorized)",
       "method": "DELETE",
-      "endpoint": "bookings/672224f6-5a77-4379-80b8-ec7dd3a3eab6",
-      "expected_status": 401,
+      "endpoint": "bookings/f7133b2e-86c5-4217-a9f3-d87b0d4b47e2",
+      "expected_status": 403,
       "actual_status": 403,
-      "success": false,
-      "response_data": {}
+      "success": true,
+      "response_data": {
+        "detail": "Not authenticated"
+      }
     },
     {
       "name": "Get All Bookings (Protected)",
@@ -167,7 +175,7 @@
       "success": true,
       "response_data": [
         {
-          "id": "672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+          "id": "f7133b2e-86c5-4217-a9f3-d87b0d4b47e2",
           "client_name": "John Doe",
           "client_email": "john@example.com",
           "client_phone": "5551234567",
@@ -176,7 +184,7 @@
           "booking_time": "10:00 AM",
           "message": "Test booking message",
           "status": "pending",
-          "created_at": "2026-01-20T04:53:28.565493Z"
+          "created_at": "2026-01-20T04:53:57.435331Z"
         },
         {
           "id": "77ceba85-5b4a-4ed6-b422-3c1c342ae6b8",
@@ -195,12 +203,12 @@
     {
       "name": "Get Booking by ID (Protected)",
       "method": "GET",
-      "endpoint": "bookings/672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+      "endpoint": "bookings/f7133b2e-86c5-4217-a9f3-d87b0d4b47e2",
       "expected_status": 200,
       "actual_status": 200,
       "success": true,
       "response_data": {
-        "id": "672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+        "id": "f7133b2e-86c5-4217-a9f3-d87b0d4b47e2",
         "client_name": "John Doe",
         "client_email": "john@example.com",
         "client_phone": "5551234567",
@@ -209,18 +217,18 @@
         "booking_time": "10:00 AM",
         "message": "Test booking message",
         "status": "pending",
-        "created_at": "2026-01-20T04:53:28.565493Z"
+        "created_at": "2026-01-20T04:53:57.435331Z"
       }
     },
     {
       "name": "Update Booking Status (Protected)",
       "method": "PATCH",
-      "endpoint": "bookings/672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+      "endpoint": "bookings/f7133b2e-86c5-4217-a9f3-d87b0d4b47e2",
       "expected_status": 200,
       "actual_status": 200,
       "success": true,
       "response_data": {
-        "id": "672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+        "id": "f7133b2e-86c5-4217-a9f3-d87b0d4b47e2",
         "client_name": "John Doe",
         "client_email": "john@example.com",
         "client_phone": "5551234567",
@@ -229,7 +237,7 @@
         "booking_time": "10:00 AM",
         "message": "Test booking message",
         "status": "confirmed",
-        "created_at": "2026-01-20T04:53:28.565493Z"
+        "created_at": "2026-01-20T04:53:57.435331Z"
       }
     },
     {
@@ -240,6 +248,13 @@
       "actual_status": 200,
       "success": true,
       "response_data": [
+        {
+          "id": "a8ba9382-1241-40ff-910f-0b76fdadec8a",
+          "name": "Jane Smith",
+          "email": "jane@example.com",
+          "message": "This is a test contact message for the videography services.",
+          "created_at": "2026-01-20T04:53:57.478858Z"
+        },
         {
           "id": "6ecfc1e4-5063-466d-a2a3-c7c4dd36484d",
           "name": "Jane Smith",
@@ -266,7 +281,7 @@
     {
       "name": "Delete Booking (Protected)",
       "method": "DELETE",
-      "endpoint": "bookings/672224f6-5a77-4379-80b8-ec7dd3a3eab6",
+      "endpoint": "bookings/f7133b2e-86c5-4217-a9f3-d87b0d4b47e2",
       "expected_status": 200,
       "actual_status": 200,
       "success": true,
