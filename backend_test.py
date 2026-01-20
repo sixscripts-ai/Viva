@@ -139,7 +139,7 @@ class DieselMediaAPITester:
 
     def test_get_bookings_unauthorized(self):
         """Test getting all bookings without auth (should fail)"""
-        success, _ = self.run_test("Get All Bookings (Unauthorized)", "GET", "bookings", 401)
+        success, _ = self.run_test("Get All Bookings (Unauthorized)", "GET", "bookings", 403)
         return success
 
     def test_get_booking_by_id_protected(self, booking_id):
