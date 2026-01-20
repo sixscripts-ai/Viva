@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Camera, Video, Building2, Sparkles, PartyPopper } from "lucide-react";
 
 const services = [
@@ -43,45 +44,90 @@ const services = [
   },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
+};
+
 export default function ServicesSection({ onBookService }) {
   return (
     <section id="services" className="py-24 md:py-32 bg-[#050505]" data-testid="services-section">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <p className="font-bebas text-[#F59E0B] text-sm tracking-[0.3em] mb-4">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <motion.p
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="font-bebas text-[#F59E0B] text-sm tracking-[0.3em] mb-4"
+          >
             WHAT WE DO
-          </p>
+          </motion.p>
           <h2 className="font-anton text-4xl sm:text-5xl lg:text-6xl text-white">
             OUR SERVICES
           </h2>
-        </div>
+        </motion.div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {services.map((service, index) => {
             const Icon = service.icon;
             return (
-              <div
+              <motion.div
                 key={service.id}
+                variants={cardVariants}
                 onClick={() => onBookService(service.value)}
                 data-testid={`service-card-${service.id}`}
+                whileHover={{ y: -8 }}
                 className={`service-card cursor-pointer bg-[#0A0A0A] border border-white/5 group ${
                   index === 0 ? "md:col-span-2 lg:col-span-2" : ""
                 }`}
               >
                 <div className="relative aspect-[16/10] overflow-hidden">
-                  <img
+                  <motion.img
                     src={service.image}
                     alt={service.title}
                     className="w-full h-full object-cover"
+                    whileHover={{ scale: 1.08 }}
+                    transition={{ duration: 0.6 }}
                   />
                   {/* Content overlay */}
                   <div className="absolute inset-0 z-10 flex flex-col justify-end p-6">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-[#F59E0B] flex items-center justify-center">
+                      <motion.div
+                        whileHover={{ rotate: 360, scale: 1.1 }}
+                        transition={{ duration: 0.5 }}
+                        className="w-10 h-10 bg-[#F59E0B] flex items-center justify-center"
+                      >
                         <Icon size={20} className="text-black" />
-                      </div>
+                      </motion.div>
                       <h3 className="font-anton text-2xl text-white">
                         {service.title}
                       </h3>
@@ -89,16 +135,25 @@ export default function ServicesSection({ onBookService }) {
                     <p className="text-[#A1A1AA] text-sm leading-relaxed max-w-md">
                       {service.description}
                     </p>
-                    <div className="mt-4 flex items-center gap-2 text-[#F59E0B] text-sm font-medium uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      whileHover={{ opacity: 1, x: 0 }}
+                      className="mt-4 flex items-center gap-2 text-[#F59E0B] text-sm font-medium uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    >
                       <span>Book This Service</span>
-                      <span>→</span>
-                    </div>
+                      <motion.span
+                        animate={{ x: [0, 4, 0] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                      >
+                        →
+                      </motion.span>
+                    </motion.div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

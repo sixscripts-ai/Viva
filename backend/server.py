@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -8,8 +9,10 @@ from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from enum import Enum
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -24,6 +27,18 @@ app = FastAPI()
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
+
+# Auth configuration
+SECRET_KEY = os.environ.get('JWT_SECRET', 'diesel-media-secret-key-2025')
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_HOURS = 24
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+security = HTTPBearer()
+
+# Admin credentials (hardcoded as requested)
+ADMIN_EMAIL = "aschtion2@gmail.com"
+ADMIN_PASSWORD_HASH = pwd_context.hash("Dieselmedia")
 
 
 # Enums
@@ -40,6 +55,18 @@ class ServiceType(str, Enum):
     COMMERCIAL = "commercial"
     SOCIAL_MEDIA = "social_media"
     REAL_ESTATE = "real_estate"
+
+
+# Auth Models
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    email: str
 
 
 # Models
@@ -88,13 +115,51 @@ class ContactMessageCreate(BaseModel):
     message: str = Field(..., min_length=10)
 
 
+# Auth Helper Functions
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return email
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+
+# Auth Routes
+@api_router.post("/auth/login", response_model=TokenResponse)
+async def login(request: LoginRequest):
+    if request.email != ADMIN_EMAIL:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    if not pwd_context.verify(request.password, ADMIN_PASSWORD_HASH):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    access_token = create_access_token(data={"sub": request.email})
+    return TokenResponse(access_token=access_token, email=request.email)
+
+
+@api_router.get("/auth/verify")
+async def verify_auth(email: str = Depends(verify_token)):
+    return {"authenticated": True, "email": email}
+
+
 # Routes
 @api_router.get("/")
 async def root():
     return {"message": "Diesel Media API"}
 
 
-# Booking Routes
+# Booking Routes (Public)
 @api_router.post("/bookings", response_model=Booking)
 async def create_booking(booking_input: BookingCreate):
     booking_data = booking_input.model_dump()
@@ -107,8 +172,9 @@ async def create_booking(booking_input: BookingCreate):
     return booking_obj
 
 
+# Protected Admin Routes
 @api_router.get("/bookings", response_model=List[Booking])
-async def get_bookings():
+async def get_bookings(email: str = Depends(verify_token)):
     bookings = await db.bookings.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
     
     for booking in bookings:
@@ -119,7 +185,7 @@ async def get_bookings():
 
 
 @api_router.get("/bookings/{booking_id}", response_model=Booking)
-async def get_booking(booking_id: str):
+async def get_booking(booking_id: str, email: str = Depends(verify_token)):
     booking = await db.bookings.find_one({"id": booking_id}, {"_id": 0})
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
@@ -131,7 +197,7 @@ async def get_booking(booking_id: str):
 
 
 @api_router.patch("/bookings/{booking_id}", response_model=Booking)
-async def update_booking_status(booking_id: str, update: BookingUpdate):
+async def update_booking_status(booking_id: str, update: BookingUpdate, email: str = Depends(verify_token)):
     result = await db.bookings.update_one(
         {"id": booking_id},
         {"$set": {"status": update.status}}
@@ -148,7 +214,7 @@ async def update_booking_status(booking_id: str, update: BookingUpdate):
 
 
 @api_router.delete("/bookings/{booking_id}")
-async def delete_booking(booking_id: str):
+async def delete_booking(booking_id: str, email: str = Depends(verify_token)):
     result = await db.bookings.delete_one({"id": booking_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Booking not found")
@@ -169,7 +235,7 @@ async def create_contact_message(message_input: ContactMessageCreate):
 
 
 @api_router.get("/contact", response_model=List[ContactMessage])
-async def get_contact_messages():
+async def get_contact_messages(email: str = Depends(verify_token)):
     messages = await db.contact_messages.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
     
     for msg in messages:
@@ -179,10 +245,9 @@ async def get_contact_messages():
     return messages
 
 
-# Time Slots Route
+# Time Slots Route (Public)
 @api_router.get("/available-times")
 async def get_available_times(date: str):
-    # Get all bookings for the date
     bookings = await db.bookings.find(
         {"booking_date": date, "status": {"$ne": "cancelled"}},
         {"_id": 0, "booking_time": 1}
@@ -190,7 +255,6 @@ async def get_available_times(date: str):
     
     booked_times = [b["booking_time"] for b in bookings]
     
-    # Available time slots
     all_times = [
         "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
         "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"

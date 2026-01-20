@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
+import QuickBookingSection from "@/components/QuickBookingSection";
 import ServicesSection from "@/components/ServicesSection";
 import PortfolioSection from "@/components/PortfolioSection";
 import BookingSection from "@/components/BookingSection";
@@ -18,9 +20,15 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505]">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-[#050505]"
+    >
       <Navigation onBookClick={() => openBookingModal()} />
       <HeroSection onBookClick={() => openBookingModal()} />
+      <QuickBookingSection onOpenModal={openBookingModal} />
       <ServicesSection onBookService={openBookingModal} />
       <PortfolioSection />
       <BookingSection onOpenModal={() => openBookingModal()} />
@@ -32,6 +40,6 @@ export default function LandingPage() {
         onClose={() => setIsBookingModalOpen(false)}
         preSelectedService={selectedService}
       />
-    </div>
+    </motion.div>
   );
 }

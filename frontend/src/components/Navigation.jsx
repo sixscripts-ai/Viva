@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -31,7 +32,10 @@ export default function Navigation({ onBookClick }) {
 
   return (
     <>
-      <nav
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
         data-testid="main-navigation"
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
@@ -42,78 +46,130 @@ export default function Navigation({ onBookClick }) {
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <a
+            <motion.a
               href="/"
               data-testid="logo-link"
               className="flex items-center gap-3"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <span className="font-anton text-2xl md:text-3xl tracking-wider text-white">
                 DIESEL<span className="text-[#F59E0B]">MEDIA</span>
               </span>
-            </a>
+            </motion.a>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <button
+              {navLinks.map((link, index) => (
+                <motion.button
                   key={link.name}
                   onClick={() => scrollToSection(link.href)}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * index, duration: 0.4 }}
                   data-testid={`nav-${link.name.toLowerCase().replace(" ", "-")}`}
-                  className="nav-link text-sm font-medium text-[#A1A1AA] hover:text-white uppercase tracking-wider"
+                  className="nav-link text-sm font-medium text-[#A1A1AA] hover:text-white uppercase tracking-wider relative group"
                 >
                   {link.name}
-                </button>
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#F59E0B] group-hover:w-full transition-all duration-300" />
+                </motion.button>
               ))}
-              <Button
-                onClick={onBookClick}
-                data-testid="nav-book-btn"
-                className="btn-skew bg-[#F59E0B] text-black font-bold uppercase tracking-wider hover:bg-[#D97706] transition-all duration-300 px-6 py-2"
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5, duration: 0.4 }}
               >
-                <span>Book Session</span>
-              </Button>
+                <Button
+                  onClick={onBookClick}
+                  data-testid="nav-book-btn"
+                  className="btn-skew bg-[#F59E0B] text-black font-bold uppercase tracking-wider hover:bg-[#D97706] transition-all duration-300 px-6 py-2"
+                >
+                  <span>Book Session</span>
+                </Button>
+              </motion.div>
             </div>
 
             {/* Mobile Menu Button */}
-            <button
+            <motion.button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               data-testid="mobile-menu-btn"
               className="md:hidden text-white p-2"
               aria-label="Toggle menu"
+              whileTap={{ scale: 0.9 }}
             >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+              <AnimatePresence mode="wait">
+                {isMobileMenuOpen ? (
+                  <motion.div
+                    key="close"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <X size={24} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="menu"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Menu size={24} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.button>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* Mobile Menu */}
-      <div
-        className={`mobile-menu ${isMobileMenuOpen ? "open" : ""}`}
-        data-testid="mobile-menu"
-      >
-        <div className="flex flex-col items-center justify-center h-full gap-8">
-          {navLinks.map((link) => (
-            <button
-              key={link.name}
-              onClick={() => scrollToSection(link.href)}
-              data-testid={`mobile-nav-${link.name.toLowerCase().replace(" ", "-")}`}
-              className="font-anton text-3xl text-white hover:text-[#F59E0B] transition-colors"
-            >
-              {link.name}
-            </button>
-          ))}
-          <Button
-            onClick={() => {
-              setIsMobileMenuOpen(false);
-              onBookClick();
-            }}
-            data-testid="mobile-book-btn"
-            className="btn-skew bg-[#F59E0B] text-black font-bold uppercase tracking-wider hover:bg-[#D97706] transition-all duration-300 px-8 py-3 text-lg mt-4"
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed inset-0 z-[100] bg-[#050505]/98 backdrop-blur-lg md:hidden"
+            data-testid="mobile-menu"
           >
-            <span>Book Session</span>
-          </Button>
-        </div>
-      </div>
+            <div className="flex flex-col items-center justify-center h-full gap-8">
+              {navLinks.map((link, index) => (
+                <motion.button
+                  key={link.name}
+                  onClick={() => scrollToSection(link.href)}
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 * index, duration: 0.3 }}
+                  data-testid={`mobile-nav-${link.name.toLowerCase().replace(" ", "-")}`}
+                  className="font-anton text-3xl text-white hover:text-[#F59E0B] transition-colors"
+                >
+                  {link.name}
+                </motion.button>
+              ))}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.3 }}
+              >
+                <Button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onBookClick();
+                  }}
+                  data-testid="mobile-book-btn"
+                  className="btn-skew bg-[#F59E0B] text-black font-bold uppercase tracking-wider hover:bg-[#D97706] transition-all duration-300 px-8 py-3 text-lg mt-4"
+                >
+                  <span>Book Session</span>
+                </Button>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
